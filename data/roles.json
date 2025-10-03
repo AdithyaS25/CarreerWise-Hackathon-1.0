@@ -1,0 +1,82 @@
+[
+  {
+    "role": "Frontend Developer",
+    "skills": ["HTML", "CSS", "JavaScript", "React", "TypeScript"],
+    "description": "Builds the user-facing part of websites and web apps, focusing on design, interactivity, and performance.",
+    "resources": [
+      "https://developer.mozilla.org/en-US/docs/Learn/Front-end_web_developer",
+      "https://reactjs.org/tutorial/tutorial.html",
+      "https://www.freecodecamp.org/learn/front-end-libraries/"
+    ]
+  },
+  {
+    "role": "UI/UX Designer",
+    "skills": ["Design Principles", "Figma", "Wireframing", "Prototyping", "User Research"],
+    "description": "Designs user interfaces and experiences, ensuring products are intuitive, usable, and visually appealing.",
+    "resources": [
+      "https://www.interaction-design.org/courses",
+      "https://www.adobe.com/creativecloud/design/discover/ui-ux.html",
+      "https://www.figma.com/resources/learn-design/"
+    ]
+  },
+  {
+    "role": "Data Analyst",
+    "skills": ["Excel", "SQL", "Python/R", "Data Visualization", "Statistics"],
+    "description": "Analyzes data to help organizations make informed decisions through insights, reports, and dashboards.",
+    "resources": [
+      "https://www.coursera.org/specializations/data-analysis",
+      "https://www.kaggle.com/learn/overview",
+      "https://www.tableau.com/learn/training"
+    ]
+  },
+  {
+    "role": "Backend Developer",
+    "skills": ["Node.js", "Python", "Java", "Databases", "APIs"],
+    "description": "Builds server-side logic, manages databases, and ensures smooth data flow between front-end and servers.",
+    "resources": [
+      "https://www.learnpython.org/",
+      "https://nodejs.dev/learn",
+      "https://www.mongodb.com/try/download/community"
+    ]
+  },
+  {
+    "role": "AI/ML Engineer",
+    "skills": ["Python", "NumPy", "Pandas", "Machine Learning", "TensorFlow/PyTorch"],
+    "description": "Builds AI and machine learning models to extract insights, make predictions, and solve complex problems.",
+    "resources": [
+      "https://www.coursera.org/specializations/machine-learning",
+      "https://scikit-learn.org/stable/tutorial/index.html",
+      "https://www.tensorflow.org/tutorials"
+    ]
+  },
+  {
+    "role": "Cybersecurity Analyst",
+    "skills": ["Networking", "Security Principles", "Linux", "Penetration Testing", "CTFs"],
+    "description": "Protects systems and networks by identifying vulnerabilities, monitoring threats, and responding to incidents.",
+    "resources": [
+      "https://www.cybrary.it/",
+      "https://www.hackthebox.eu/",
+      "https://owasp.org/www-project-top-ten/"
+    ]
+  },
+  {
+    "role": "Product Manager",
+    "skills": ["Agile", "Requirements Gathering", "Roadmaps", "User Stories", "Data Analysis"],
+    "description": "Oversees product development, aligning business goals with user needs and coordinating cross-functional teams.",
+    "resources": [
+      "https://www.productschool.com/blog/product-management-2/product-management-certification/",
+      "https://www.intercom.com/blog/product-management/",
+      "https://www.coursera.org/learn/uva-darden-product-management"
+    ]
+  },
+  {
+    "role": "DevOps Engineer",
+    "skills": ["Linux", "CI/CD", "Docker", "Kubernetes", "Cloud Platforms"],
+    "description": "Maintains infrastructure, automates deployment pipelines, and ensures system reliability and scalability.",
+    "resources": [
+      "https://www.redhat.com/en/topics/devops",
+      "https://kubernetes.io/docs/tutorials/",
+      "https://www.aws.training/Details/Curriculum?id=20685"
+    ]
+  }
+]
