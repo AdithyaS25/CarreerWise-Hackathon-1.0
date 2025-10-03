@@ -1,53 +1,75 @@
 "use client";
+
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { generateRoadmap } from "../../../utils/roadmap";
 
 export default function ResultsPage() {
-  const [results, setResults] = useState<any>(null);
   const router = useRouter();
+  const [roadmap, setRoadmap] = useState<string>("");
+  const [loading, setLoading] = useState<boolean>(true);
+  const [isFallback, setIsFallback] = useState<boolean>(false); // New state
 
   useEffect(() => {
-    const data = localStorage.getItem("quizAnswers");
-    if (data) {
-      const answers = JSON.parse(data);
-      // Simple mapping logic for demo
-      const top3 = [
-        { role: "Frontend Developer", score: answers[0] + 5 },
-        { role: "UI/UX Designer", score: answers[1] + 5 },
-        { role: "Data Analyst", score: answers[2] + 5 },
-      ];
-      setResults({ top3 });
-    } else router.push("/quiz");
-  }, [router]);
+    const fetchRoadmap = async () => {
+      try {
+        const answers = JSON.parse(localStorage.getItem("quizAnswers") || "[]");
+        const role = "Frontend Developer"; // Replace with dynamic logic if needed
 
-  if (!results) return <p>Loading...</p>;
+        const res = await fetch("/api/recommend", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ role, answers }),
+        });
 
-  const handleRoadmap = (role: any) => {
-    const roadmap = generateRoadmap(role);
-    alert(`Roadmap for ${roadmap.role}:\n\n${roadmap.steps.join("\n")}`);
-  };
+        const data = await res.json();
+        if (data.roadmap) {
+          setRoadmap(data.roadmap);
+
+          // If returned roadmap equals static fallback, mark as fallback
+          if (data.roadmap.includes("1. Learn HTML, CSS, and JavaScript")) {
+            setIsFallback(true);
+          }
+        } else {
+          setRoadmap("No roadmap found. Try taking the quiz again!");
+        }
+      } catch (err) {
+        console.error(err);
+        setRoadmap("Error fetching roadmap. Please try again later.");
+        setIsFallback(true);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchRoadmap();
+  }, []);
 
   return (
-    <div className="flex flex-col items-center min-h-screen p-4">
-      <h2 className="text-3xl font-bold mb-6">Top Career Matches</h2>
-      {results.top3.map((r: any) => (
-        <div key={r.role} className="bg-white p-4 rounded shadow mb-4 w-full max-w-md">
-          <h3 className="text-xl font-semibold">{r.role}</h3>
-          <div className="h-2 bg-gray-200 rounded mt-2">
-            <div
-              className="h-2 bg-blue-500 rounded"
-              style={{ width: `${(r.score / 10) * 100}%` }}
-            ></div>
+    <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-r from-purple-500 via-pink-500 to-orange-400 p-6">
+      <h2 className="text-4xl font-bold mb-8 text-white text-center drop-shadow-lg">
+        Your Career Roadmap
+      </h2>
+
+      <div className="w-full max-w-lg bg-white bg-opacity-80 rounded-xl p-6 shadow-lg backdrop-blur-md">
+        {loading ? (
+          <p className="text-center text-gray-700">Generating your roadmap...</p>
+        ) : (
+          <div>
+            {isFallback && (
+              <p className="text-sm text-red-600 mb-4 text-center font-semibold">
+                ⚠ Using static fallback roadmap due to API limit or key issue
+              </p>
+            )}
+            <p className="text-gray-800 whitespace-pre-line">{roadmap}</p>
+            <button
+              onClick={() => router.push("/quiz")}
+              className="mt-6 w-full bg-purple-600 text-white py-3 rounded-xl font-semibold hover:bg-purple-700 transition-colors"
+            >
+              Retake Quiz
+            </button>
           </div>
-          <button
-            onClick={() => handleRoadmap(r)}
-            className="mt-2 bg-purple-600 text-white px-4 py-1 rounded hover:bg-purple-700"
-          >
-            Generate Roadmap
-          </button>
-        </div>
-      ))}
+        )}
+      </div>
     </div>
   );
 }
