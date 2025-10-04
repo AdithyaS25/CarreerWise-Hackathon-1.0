@@ -25,7 +25,7 @@ const roleTemplates: Record<string, string[]> = {
   // ... add other roles
 };
 
-export function generateRoadmap(role: any): Roadmap {
+export function generateRoadmap(role: { role: string }): Roadmap {
   const steps = roleTemplates[role.role] || [
     "Learn the basics",
     "Build small projects",
