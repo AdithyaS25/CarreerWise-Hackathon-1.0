@@ -34,9 +34,8 @@ export default function ResultsPage() {
         if (data.roadmap) {
           setRoadmap(data.roadmap);
           setIsFallback(data.llmFailed);
-          setTopRoles(data.topRoles || []); // Ensure default empty array if undefined
+          setTopRoles(data.topRoles || []);
 
-          // Safely check if topRoles exists and has exactly one role
           if (data.topRoles?.length === 1) {
             setSelectedRole(data.topRoles[0]);
           }
@@ -56,10 +55,32 @@ export default function ResultsPage() {
     fetchRoadmap();
   }, []);
 
+  const renderTextWithLinks = (text: string) => {
+    const urlRegex = /(https?:\/\/[^\s]+)/g;
+    const parts = text.split(urlRegex);
+    return parts.map((part, i) =>
+      urlRegex.test(part) ? (
+        <a
+          key={i}
+          href={part}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="text-blue-600 underline hover:text-blue-800"
+        >
+          {part}
+        </a>
+      ) : (
+        part
+      )
+    );
+  };
+
   const renderRoadmap = () => {
     if (typeof roadmap === "string") {
-      return <p className="text-gray-800 whitespace-pre-line">{roadmap}</p>;
+      // LLM-generated string
+      return <p className="text-gray-800 whitespace-pre-line">{renderTextWithLinks(roadmap)}</p>;
     } else if (Array.isArray(roadmap) && selectedRole) {
+      // Static fallback roadmap from roles.json
       const roleData = roadmap.find((r: StaticRole) => r.role === selectedRole);
       if (!roleData) return null;
 
