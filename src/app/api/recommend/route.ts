@@ -30,7 +30,7 @@ export async function POST(req: NextRequest) {
     const prompt = `You are a career guidance assistant.
 Generate a personalized roadmap for the following roles based on a user quiz: ${roleNames}.
 Provide 5-6 practical steps in a concise and actionable way.
-Respond in plain text.`;
+Respond in plain text without any bold or italic fonting.`;
 
     let llmRoadmap = "";
     try {
