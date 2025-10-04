@@ -1,45 +1,68 @@
-// src/app/api/recommend/route.ts
 import { NextRequest, NextResponse } from "next/server";
-import OpenAI from "openai";
+import { GoogleGenerativeAI } from "@google/generative-ai";
+import rolesData from "../../../../data/roles.json";
 
-// Static fallback roadmap
-const staticRoadmap = `1. Learn HTML, CSS, and JavaScript fundamentals
-2. Build small web projects to practice
-3. Get comfortable with React and frontend frameworks
-4. Learn version control (Git) and deployment basics
-5. Explore backend basics (Node.js, APIs)
-6. Start contributing to open-source or personal projects`;
+type Role = {
+  role: string;
+  skills: string[];
+  description: string;
+  resources: string[];
+};
 
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
-});
+const roles: Role[] = rolesData;
+
+const client = new GoogleGenerativeAI(process.env.GEMINI_API_KEY as string);
 
 export async function POST(req: NextRequest) {
   try {
-    const { answers, role } = await req.json();
+    const { answers } = await req.json();
+    if (!answers || !Array.isArray(answers)) {
+      return NextResponse.json({ roadmap: "Invalid quiz answers" }, { status: 400 });
+    }
 
-    // Generate prompt for OpenAI
+    const maxScore = Math.max(...answers);
+    const topIndexes = answers
+      .map((score: number, i: number) => (score === maxScore ? i : -1))
+      .filter((i: number) => i !== -1);
+
+    const recommendedRoles: Role[] = topIndexes.map((idx: number) => roles[idx]).filter(Boolean);
+    const roleNames = recommendedRoles.map((r) => r.role).join(", ");
     const prompt = `You are a career guidance assistant.
-Generate a concise, actionable roadmap for the role "${role}" based on these quiz answers: ${JSON.stringify(
-      answers
-    )}.
-Provide 5-6 practical steps.`;
+Generate a personalized roadmap for the following roles based on a user quiz: ${roleNames}.
+Provide 5-6 practical steps in a concise and actionable way.
+Respond in plain text.`;
 
-    // Try calling OpenAI
-    const response = await openai.chat.completions.create({
-      model: "gpt-3.5-turbo",
-      messages: [{ role: "user", content: prompt }],
-      max_tokens: 400,
-    });
+    let llmRoadmap = "";
+    try {
+      // Use a valid model name as per Google Generative AI latest supported models
+      const model = client.getGenerativeModel({ model: "gemini-2.5-flash" });
+      const result = await model.generateContent([prompt]);
+      const contentObj = result.response?.candidates?.[0]?.content;
+      llmRoadmap = typeof contentObj === "string"
+        ? contentObj
+        : contentObj?.parts?.[0]?.text ?? "";
+    } catch (e) {
+      console.error("Gemini API error:", e);
+    }
 
-    const result = response.choices[0].message?.content;
+    const staticRoadmap = recommendedRoles
+      .map(
+        (r) =>
+          `${r.role}:\nDescription: ${r.description}\nSkills: ${r.skills.join(
+            ", "
+          )}\nResources:\n${r.resources.map((link) => `- ${link}`).join("\n")}\n`
+      )
+      .join("\n");
 
-    // If OpenAI fails to return, fallback to static roadmap
-    return NextResponse.json({ roadmap: result || staticRoadmap });
-  } catch (err: any) {
-    console.error("OpenAI error:", err.message);
+    const roadmapToSend = llmRoadmap ? llmRoadmap : staticRoadmap;
+    const isFallback = !llmRoadmap;
 
-    // Fallback to static roadmap in case of errors
-    return NextResponse.json({ roadmap: staticRoadmap });
+    return NextResponse.json({ roadmap: roadmapToSend, isFallback });
+  } catch (err) {
+    console.error(err);
+    return NextResponse.json(
+      { roadmap: "Error generating roadmap. Using static fallback.", isFallback: true },
+      { status: 500 }
+    );
   }
 }
